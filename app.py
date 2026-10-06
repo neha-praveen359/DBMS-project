@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from indexing import indexing_menu
 
 
 # ============================================================
@@ -1167,7 +1168,8 @@ def main():
         print("3. Update Claim")
         print("4. Delete Claim")
         print("5. Filter Claims")
-        print("6. Exit")
+        print("6. Indexing & Query Performance")
+        print("7. Exit")
 
         print("=" * 50)
 
@@ -1191,6 +1193,9 @@ def main():
             filter_claims(collection)
 
         elif choice == "6":
+            indexing_menu(collection)
+
+        elif choice == "7":
             print("\nThank you for using the system.")
             print("Application closed.")
             break

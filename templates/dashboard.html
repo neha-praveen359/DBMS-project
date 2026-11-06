@@ -1,0 +1,15 @@
+{% extends 'base.html' %}{% block title %}Dashboard · InsureIQ{% endblock %}{% block heading %}Claims intelligence dashboard{% endblock %}
+{% block content %}
+<div class="hero"><div><div class="hero-kicker">LIVE MONGODB OVERVIEW</div><h2>Understand your claims at a glance.</h2><p>Manage records, investigate fraud, explore trends and demonstrate database performance from one workspace.</p></div><a class="button light" href="{{ url_for('analytics_web') }}">Explore analytics →</a></div>
+<div class="stat-grid">
+<div class="stat-card"><span>Total claims</span><strong>{{ total }}</strong><small>Records in collection</small></div>
+<div class="stat-card"><span>Total claim value</span><strong>{{ total_amount|money }}</strong><small>Across all claims</small></div>
+<div class="stat-card"><span>Average claim</span><strong>{{ avg_amount|money }}</strong><small>Mean claim amount</small></div>
+<div class="stat-card accent"><span>Fraud reported</span><strong>{{ fraud }}</strong><small>{{ nonfraud }} non-fraud records</small></div>
+</div>
+<div class="two-grid">
+<section class="panel"><div class="panel-head"><div><span class="eyebrow">RECENT RECORDS</span><h3>Latest claims</h3></div><a class="text-link" href="{{ url_for('search_claims_web') }}">View all →</a></div>
+{% if recent %}<div class="table-wrap"><table><thead><tr><th>Policy</th><th>Incident</th><th>Vehicle</th><th>Amount</th><th>Status</th></tr></thead><tbody>{% for c in recent %}<tr><td><a class="table-link" href="{{ url_for('claim_detail',claim_id=c._id) }}">{{ c.policy_number }}</a></td><td>{{ c.incident_type|pretty }} · {{ c.incident_state|pretty }}</td><td>{{ c.auto_make|pretty }} {{ c.auto_model|pretty }}</td><td>{{ c.total_claim_amount|money }}</td><td><span class="pill {{ 'danger' if c.fraud_reported=='Y' else 'safe' }}">{{ 'Fraud' if c.fraud_reported=='Y' else 'Clear' }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty">No claims are currently available.</div>{% endif %}</section>
+<section class="panel"><div class="panel-head"><div><span class="eyebrow">SYSTEM SNAPSHOT</span><h3>Collection profile</h3></div></div><div class="profile-list"><div><span>Incident states</span><strong>{{ states }}</strong></div><div><span>Vehicle makes</span><strong>{{ makes }}</strong></div><div><span>Fraud rate</span><strong>{{ ((fraud / total * 100) if total else 0)|round(1) }}%</strong></div><div><span>Database</span><strong>insurance_company</strong></div></div><div class="quick-actions"><a href="{{ url_for('performance_web') }}">Test query performance</a><a href="{{ url_for('indexes_web') }}">Manage indexes</a><a href="{{ url_for('ai_search_web') }}">Try natural-language search</a></div></section>
+</div>
+{% endblock %}

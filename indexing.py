@@ -6,18 +6,6 @@ from pymongo import ASCENDING
 # ============================================================
 
 def create_indexes(collection):
-    """
-    Create indexes for fields that are frequently searched.
-
-    policy_number:
-        Frequently used to locate one specific claim.
-
-    incident_state:
-        Frequently used for filtering claims by state.
-
-    fraud_reported:
-        Frequently used for fraud/non-fraud analysis.
-    """
 
     print("\n" + "=" * 60)
     print("                 CREATE DATABASE INDEXES")
@@ -54,7 +42,6 @@ def create_indexes(collection):
 # ============================================================
 
 def show_indexes(collection):
-    """Display all indexes currently present on the collection."""
 
     print("\n" + "=" * 60)
     print("                    CURRENT INDEXES")
@@ -79,14 +66,6 @@ def show_indexes(collection):
 # ============================================================
 
 def _get_execution_stats(explain_result):
-    """
-    Extract execution statistics from an explain() result.
-
-    MongoDB normally returns:
-        executionStats.executionTimeMillis
-        executionStats.totalDocsExamined
-        executionStats.totalKeysExamined
-    """
 
     stats = explain_result.get("executionStats", {})
 
@@ -99,16 +78,6 @@ def _get_execution_stats(explain_result):
 
 
 def demonstrate_query_performance(collection):
-    """
-    Compare a collection scan with an indexed query.
-
-    The comparison uses policy_number because it is the most
-    natural exact-search field in the application.
-
-    A real policy number is requested from the user. If the
-    number does not exist, the demonstration still shows the
-    query plans and examined documents/keys.
-    """
 
     print("\n" + "=" * 60)
     print("             QUERY PERFORMANCE DEMONSTRATION")
@@ -123,9 +92,6 @@ def demonstrate_query_performance(collection):
         return
 
     try:
-        # ------------------------------------------------------
-        # Make sure the required index exists.
-        # ------------------------------------------------------
         collection.create_index(
             [("policy_number", ASCENDING)],
             name="idx_policy_number"
@@ -136,9 +102,6 @@ def demonstrate_query_performance(collection):
         # ------------------------------------------------------
         # A. Collection scan (without using the index)
         # ------------------------------------------------------
-        # Use MongoDB's explain command directly. This avoids
-        # Cursor.explain() compatibility issues between PyMongo
-        # versions.
         collection_scan_explain = collection.database.command(
             "explain",
             {
@@ -268,27 +231,16 @@ def demonstrate_query_performance(collection):
                 "demonstrating index usage."
             )
 
-        print(
-            "\nFor the project presentation, explain that an index "
-            "allows MongoDB to locate matching values more directly "
-            "instead of scanning every document."
-        )
-
     except Exception as error:
         print("\nUnable to run the performance demonstration.")
         print("Error:", error)
 
 
 # ============================================================
-# 4. PERSON 3 MENU
+# 4. INDEXING MENU
 # ============================================================
 
 def indexing_menu(collection):
-    """
-    Menu for Person 3's indexing functionality.
-
-    This menu can be called from the main app.py menu.
-    """
 
     while True:
         print("\n" + "=" * 60)
@@ -298,7 +250,7 @@ def indexing_menu(collection):
         print("1. Create/Verify Indexes")
         print("2. Show Current Indexes")
         print("3. Demonstrate Query Performance")
-        print("4. Back to Main Menu")
+        print("0. Back to Main Menu")
 
         print("=" * 60)
 
@@ -313,7 +265,7 @@ def indexing_menu(collection):
         elif choice == "3":
             demonstrate_query_performance(collection)
 
-        elif choice == "4":
+        elif choice == "0":
             break
 
         else:

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}InsureIQ{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">IQ</div><div><strong>InsureIQ</strong><span>Claims intelligence</span></div></div>
+  <nav>
+    <a class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span>⌂</span> Dashboard</a>
+    <div class="nav-label">Claims</div>
+    <a class="nav-link {% if request.endpoint in ['register_claim','search_claims_web','claim_detail','edit_claim'] %}active{% endif %}" href="{{ url_for('search_claims_web') }}"><span>▤</span> Claims</a>
+    <a class="nav-link" href="{{ url_for('register_claim') }}"><span>＋</span> Register claim</a>
+    <a class="nav-link {% if request.endpoint=='filter_claims_web' %}active{% endif %}" href="{{ url_for('filter_claims_web') }}"><span>⌕</span> Filter</a>
+    <div class="nav-label">Intelligence</div>
+    <a class="nav-link {% if request.endpoint=='analytics_web' %}active{% endif %}" href="{{ url_for('analytics_web') }}"><span>◫</span> Analytics</a>
+    <a class="nav-link {% if request.endpoint=='statistics_web' %}active{% endif %}" href="{{ url_for('statistics_web') }}"><span>∑</span> Statistics</a>
+    <a class="nav-link {% if request.endpoint=='ai_search_web' %}active{% endif %}" href="{{ url_for('ai_search_web') }}"><span>✦</span> Natural-language search</a>
+    <div class="nav-label">Database</div>
+    <a class="nav-link {% if request.endpoint=='indexes_web' %}active{% endif %}" href="{{ url_for('indexes_web') }}"><span>⌘</span> Indexes</a>
+    <a class="nav-link {% if request.endpoint=='performance_web' %}active{% endif %}" href="{{ url_for('performance_web') }}"><span>↗</span> Query performance</a>
+  </nav>
+  <div class="sidebar-footer"><div class="status-dot"></div><div><strong>MongoDB</strong><span>Connected through Flask</span></div></div>
+</aside>
+<main class="main">
+<header class="topbar"><div><span class="eyebrow">INSURANCE CLAIMS MANAGEMENT</span><h1>{% block heading %}Operations overview{% endblock %}</h1></div><a class="top-action" href="{{ url_for('register_claim') }}">＋ New claim</a></header>
+<section class="content">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+{% endwith %}
+{% block content %}{% endblock %}
+</section>
+</main>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

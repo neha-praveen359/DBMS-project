@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Claims · InsureIQ{% endblock %}
+{% block heading %}Claims workspace{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="search-hero">
+    <div>
+      <span class="eyebrow">CLAIM RECORDS</span>
+      <h2>All insurance claims.</h2>
+      <p>Browse every claim, search records, open details, update fields, or delete a record.</p>
+    </div>
+    <a class="button" href="{{ url_for('register_claim') }}">＋ Register claim</a>
+  </div>
+  <form class="search-bar" method="get" action="{{ url_for('search_claims_web') }}">
+    <input name="q" value="{{ q }}" placeholder="Search policy, incident, state, city, vehicle, fraud...">
+    <button class="button" type="submit">Search</button>
+    {% if q %}<a class="button ghost" href="{{ url_for('search_claims_web') }}">Clear</a>{% endif %}
+  </form>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <div><span class="eyebrow">DATABASE RECORDS</span><h3>{{ total }} matching claim{{ '' if total == 1 else 's' }}</h3></div>
+    <span class="pill safe">Page {{ page }} of {{ pages }}</span>
+  </div>
+  {% if claims %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Policy</th><th>Incident</th><th>Location</th><th>Vehicle</th><th>Claim</th><th>Fraud</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for c in claims %}
+        <tr>
+          <td><a class="table-link" href="{{ url_for('claim_detail', claim_id=c._id) }}">{{ c.policy_number }}</a></td>
+          <td>{{ c.incident_type|pretty }}<br><small>{{ c.incident_severity|pretty }}</small></td>
+          <td>{{ c.incident_city|pretty }}, {{ c.incident_state|pretty }}</td>
+          <td>{{ c.auto_make|pretty }} {{ c.auto_model|pretty }}<br><small>{{ c.auto_year|pretty }}</small></td>
+          <td>{{ c.total_claim_amount|money }}</td>
+          <td><span class="pill {{ 'danger' if c.fraud_reported=='Y' else 'safe' }}">{{ c.fraud_reported|pretty }}</span></td>
+          <td>
+            <div class="row-actions">
+              <a class="button ghost" href="{{ url_for('claim_detail', claim_id=c._id) }}">View</a>
+              <a class="button ghost" href="{{ url_for('edit_claim', claim_id=c._id) }}">Edit</a>
+              <form method="post" action="{{ url_for('delete_claim_web', claim_id=c._id) }}" onsubmit="return confirm('Permanently delete claim {{ c.policy_number }}?');">
+                <input type="hidden" name="confirm" value="yes">
+                <button class="button danger-button" type="submit">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="empty">{% if q %}No claims match “{{ q }}”. Try a broader search.{% else %}No claims are currently available in the collection.{% endif %}</div>
+  {% endif %}
+  {% if pages > 1 %}
+  <div class="form-actions pagination">
+    {% if page > 1 %}<a class="button ghost" href="{{ url_for('search_claims_web', q=q, page=page-1) }}">← Previous</a>{% endif %}
+    <span>Page {{ page }} / {{ pages }}</span>
+    {% if page < pages %}<a class="button" href="{{ url_for('search_claims_web', q=q, page=page+1) }}">Next →</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

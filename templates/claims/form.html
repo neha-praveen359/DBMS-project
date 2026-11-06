@@ -1,0 +1,43 @@
+{% extends 'base.html' %}{% block title %}{{ 'Edit' if editing else 'Register' }} claim · InsureIQ<script>
+(function () {
+  const bindInput = document.querySelector('[name="policy_bind_date"]');
+  const monthsInput = document.querySelector('[name="months_as_customer"]');
+  if (!bindInput || !monthsInput) return;
+
+  function updateMonths() {
+    if (!bindInput.value) {
+      monthsInput.value = '';
+      return;
+    }
+    const parts = bindInput.value.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(Number.isNaN)) return;
+    const bindDate = new Date(parts[0], parts[1] - 1, parts[2]);
+    const today = new Date();
+    let months = (today.getFullYear() - bindDate.getFullYear()) * 12
+      + (today.getMonth() - bindDate.getMonth());
+    if (today.getDate() < bindDate.getDate()) months -= 1;
+    if (months < 0) {
+      monthsInput.value = '0';
+      return;
+    }
+    monthsInput.value = String(months);
+  }
+
+  bindInput.addEventListener('change', updateMonths);
+  bindInput.addEventListener('input', updateMonths);
+  updateMonths();
+})();
+</script>
+{% endblock %}{% block heading %}{{ 'Edit claim' if editing else 'Register a new claim' }}{% endblock %}
+{% block content %}
+<form method="post" class="claim-form" id="claimForm">
+{% if editing %}<div class="notice"><strong>Editing existing record.</strong> Save changes when all sections are correct.</div>{% else %}<div class="notice"><strong>New claim intake.</strong> Fields marked with * are required. Entering an empty optional field stores it as unavailable.</div>{% endif %}
+{% for section, fields in sections.items() %}<section class="form-section"><div class="section-heading"><span class="section-number">{{ '%02d' % loop.index }}</span><div><span class="eyebrow">CLAIM INTAKE</span><h3>{{ section }}</h3></div></div><div class="form-grid">
+{% for field,label,kind in fields %}<label class="field"><span>{{ label }}{% if field in ['policy_number','policy_bind_date'] %} *{% endif %}</span>
+{% if kind=='select' %}<select name="{{ field }}"><option value="">None / unavailable</option><option value="Y" {% if claim.get(field)=='Y' %}selected{% endif %}>Yes (Y)</option><option value="N" {% if claim.get(field)=='N' %}selected{% endif %}>No (N)</option><option value="NONE" {% if claim.get(field)=='NONE' or claim.get(field) is none and claim.get(field)!='' %}selected{% endif %}>None</option></select>
+{% else %}<input name="{{ field }}" type="{{ kind }}" value="{{ claim.get(field,'') }}" {% if field in ['policy_number','policy_bind_date'] %}required{% endif %} {% if kind=='number' %}min="0" step="any"{% endif %} {% if field=='months_as_customer' %}readonly aria-readonly="true" title="Calculated from Policy Bind Date to today"{% endif %}>{% endif %}</label>{% endfor %}
+</div></section>{% endfor %}
+{% if mismatch %}<div class="confirm-box"><strong>Component mismatch detected.</strong><p>Injury + property + vehicle claim does not equal total claim amount.</p><label><input type="checkbox" name="confirm_mismatch" value="yes"> I understand and want to register this record anyway.</label></div>{% endif %}
+<div class="form-actions"><a class="button ghost" href="{{ url_for('search_claims_web') }}">Cancel</a><button class="button" type="submit">{{ 'Save changes' if editing else 'Register claim' }} →</button></div>
+</form>
+{% endblock %}

@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}{{ code }} · InsureIQ{% endblock %}{% block heading %}Something went off course{% endblock %}{% block content %}<section class="panel error-page"><div class="error-code">{{ code }}</div><h2>{{ message }}</h2><a class="button" href="{{ url_for('dashboard') }}">Return to dashboard</a></section>{% endblock %}
